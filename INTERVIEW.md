@@ -73,3 +73,71 @@ One‑slide summary (bullet points)
   - Role‑based access control pattern, env config for API URL, mockable backend for demos
   - Production improvements: secure auth (httpOnly cookies), tests, code‑splitting, request cancellation
 - Demo suggestions: log in as each role, submit a claim, show survey report and admin approval status changes.
+
+
+## Bugs
+
+
+1) Mock server path mismatch (high)
+- Problem: package.json mock-server points to wrong db file location.
+- Fix: update script to watch db.json (or move db.json to repo root).
+- Suggested change:
+````json
+// ...existing code...
+{
+  "scripts": {
+    "mock-server": "json-server --watch src/utils/db.json --port 4000",
+    "dev": "vite",
+    "start:all": "concurrently \"npm run mock-server\" \"npm run dev\""
+  }
+}
+// ...existing code...
+````
+2) Hard-coded API base URL (medium)
+- Problem: api baseURL may be hard-coded; breaks if mock server port changes or in production.
+- Fix: use env var (VITE_API_URL) with fallback.
+- Suggested code:
+````javascript
+// ...existing code...
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000',
+  headers: { 'Content-Type': 'application/json' },
+});
+
+export default api;
+// ...existing code...
+````
+3) Filename / import typos (medium)
+- Problem: file named Applyolicy.jsx (typo) — inconsistent naming; imports may break on case-sensitive systems.
+- Fix: rename to ApplyPolicy.jsx and update imports in routes and any components that reference it.
+
+4) Route protection & role checks (medium → security)
+- Problem: ProtectedRoute may only check auth flag but not role. Users could access other-role pages.
+- Fix: enforce role-based access in ProtectedRoute or router (check user.role against allowedRoles prop).
+
+5) Missing keys in lists & React warnings (low)
+- Problem: lists like ClaimList may render items without key prop.
+- Fix: add unique key (claim.id) to each rendered list item.
+
+6) useEffect dependency / cleanup issues (low → reliability)
+- Problem: dashboards/components likely have useEffect with missing dependencies or no cleanup for subscriptions/requests.
+- Fix: add dependency arrays, cancel tokens for axios or isMounted flags where needed.
+
+7) API error handling & loading states (low → UX)
+- Problem: API calls may not handle errors/loading — UI can hang or crash.
+- Fix: add try/catch, set loading and error states, show user-friendly messages.
+
+8) Auth persistence & sensitive storage (medium → security)
+- Problem: tokens or user info may be stored in localStorage without expiry/encryption.
+- Fix: consider httpOnly cookies for real apps; at minimum clear on logout and avoid storing sensitive info.
+
+9) Missing unit tests, lint, accessibility (low → maintainability)
+- Add basic unit tests for core components and an ESLint/Prettier config and aria attributes where appropriate.
+
+If you want, I can:
+- Apply the package.json and api.js changes now, or
+- Open specific files (Applyolicy.jsx, ProtectedRoute.js, src/modules/*) and list exact lines to change.
+
+Which change should I make first?
