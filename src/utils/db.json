@@ -1,0 +1,14 @@
+{
+  "policies": [
+    { "id": 1, "name": "Car Protect", "premium": 300, "details": "Full cover" },
+    { "id": 2, "name": "Home Safe", "premium": 250, "details": "Fire & theft" }
+  ],
+  "users": [
+    { "id": 1, "role": "admin", "username": "admin", "password": "admin" }
+  ],
+  "surveyors": [
+    { "id": 1, "name": "John Doe", "email": "john@example.com" }
+  ],
+  "applications": [],
+  "claims": []
+}
